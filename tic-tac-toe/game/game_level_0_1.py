@@ -20,75 +20,56 @@ class TicTacToe():
         for i, player in enumerate(self.players):
             player.set_player_number(i + 1)
 
+    def run_to_completion(self):
+        while self.winner == None:
+            self.complete_round()
+
+    def complete_round(self):
+
+        for player_number in self.player_coords.keys():
+            if self.winner == None:
+
+                self.player_move(player_number)
+                self.check_if_player_won(player_number)
+                
+                if self.do_draw_game:
+                    self.draw_game()
+
     def player_move(self, player_number):
         
-        if self.winner == None:
+        all_coords = [[x, y] for x in range(3) for y in range(3)]
+        both_player_coords = self.player_coords[1] + self.player_coords[2]
+        free_coords = [coord for coord in all_coords if coord not in both_player_coords]
 
-            move = self.players[player_number - 1].move(self.player_coords)
-            self.player_coords[player_number].append(move)
-            
-            if self.do_draw_game:
-                self.draw_game()
-
-            self.check_if_player_won(player_number)
-            
-            if self.do_draw_game:
-                print("\nself.winner:", self.winner)
+        move = self.players[player_number - 1].move(free_coords)
+        self.player_coords[player_number].append(move)
 
     def check_if_player_won(self, player_number):
-        
-        player_wins = False
+
         player_coords = self.player_coords[player_number]
-        
+
         if len(player_coords) > 2:
-            
-            for combination in self.combinations(player_coords):
                 
+            for combination in self.combinations(player_coords):
+                    
                 xs = [elem[0] for elem in combination]
                 ys = [elem[1] for elem in combination]
 
                 if len(set(xs)) == 1 or len(set(ys)) == 1:
-                    player_wins = True
-                    break
-                
+                    self.winner = player_number
+                    return
+                    
                 left_to_right_diagonal = [x == y for x, y in combination]
                 right_to_left_diagonal = [x == 2 - y for x, y in combination]
 
                 if all(left_to_right_diagonal) or all(right_to_left_diagonal):
-                    player_wins = True
-                    break
-        
-            if player_wins:
-                self.winner = player_number
+                    self.winner = player_number
+                    return
         
             total_num_coords = self.player_coords[self.who_goes_first] + self.player_coords[self.who_goes_second]
-            if not player_wins and len(total_num_coords) == 9:
+            if len(total_num_coords) == 9:
                 self.winner = 'tie'
-    
-    def combinations(self, input_list):
-        
-        combinations_list = []
-                
-        for elem1 in input_list:
-            for elem2 in [elem for elem in input_list if elem != elem1]:
-                for elem3 in [elem for elem in input_list if elem != elem1 and elem != elem2]:
-                    
-                    possible_combination = [elem1, elem2, elem3]
-                    combination_is_original = True
-                            
-                    for combination in combinations_list:
-                        if sorted(combination) == sorted(possible_combination):
-                            combination_is_original = False
-
-                    if combination_is_original:
-                        combinations_list.append(possible_combination)
-                
-        return combinations_list
-
-    def run_to_completion(self):
-        while self.winner == None:
-            self.player_move(self.who_goes_first)
-            self.player_move(self.who_goes_second)
+                return
 
     def draw_game(self):
         
@@ -106,3 +87,23 @@ class TicTacToe():
                 str_row_list[i] += str(elem) + ' '
         
         print('\n' + str_row_list[0] + '\n' + str_row_list[1] + '\n' + str_row_list[2])
+
+    def combinations(self, player_coords):
+        
+        combinations_list = []
+                
+        for coord1 in player_coords:
+            for coord2 in [coord for coord in player_coords if coord != coord1]:
+                for coord3 in [coord for coord in player_coords if coord != coord1 and coord != coord2]:
+                    
+                    possible_combination = [coord1, coord2, coord3]
+                    combination_is_original = True
+                            
+                    for combination in combinations_list:
+                        if sorted(combination) == sorted(possible_combination):
+                            combination_is_original = False
+
+                    if combination_is_original:
+                        combinations_list.append(possible_combination)
+                
+        return combinations_list

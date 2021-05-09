@@ -13,25 +13,23 @@ players = [RandomPlayer() if elem == 'random' else InputPlayer() for elem in gam
 
 if game_type == 'random vs random':
 
-    num_p1_wins = 0
-    num_p2_wins = 0
-    num_ties = 0
+    num_wins = {1: 0, 2: 0, 'tie': 0}
     num_trials = 1000
 
     for i in range(num_trials):
         
         game = TicTacToe(players, who_goes_first = (i % 2) + 1, do_draw_game = (i == 0))
         game.run_to_completion()
-    
-        num_p1_wins += int(game.winner == 1)
-        num_p2_wins += int(game.winner == 2)
-        num_ties += int(game.winner == 'tie')
+        num_wins[game.winner] += (100 / num_trials)
 
-    print("\np1 win %:", 100 * num_p1_wins / num_trials)
-    print("p2 win %:", 100 * num_p2_wins / num_trials)
-    print("tie %:", 100 * num_ties / num_trials)
+        if i == 0:
+            print("\ngame.winner:", game.winner)
+
+    num_wins = {key:round(value, 2) for key, value in num_wins.items()}
+    print("\nnum_wins:", num_wins)
 
 else:
 
-    game = Game(players, who_goes_first = 1, do_draw_game = True)
+    game = TicTacToe(players, who_goes_first = 1, do_draw_game = True)
     game.run_to_completion()
+    print("\ngame.winner:", game.winner)
