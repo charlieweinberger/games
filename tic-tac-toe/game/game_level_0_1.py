@@ -1,7 +1,4 @@
-import itertools
-import random
-
-class Game():
+class TicTacToe():
 
     def __init__(self, players, who_goes_first, do_draw_game=False):
         
@@ -12,14 +9,12 @@ class Game():
         self.who_goes_second = 1 if self.who_goes_first == 2 else 2
         self.do_draw_game = do_draw_game
 
-        self.state = {
-            'turn': 1,
-            'players': {
-                self.who_goes_first: [],
-                self.who_goes_second: [],
-            },
-            'winner': None
-        } 
+        self.player_coords = {
+                                self.who_goes_first: [],
+                                self.who_goes_second: [],
+                             }
+
+        self.winner = None
 
     def set_player_numbers(self):
         for i, player in enumerate(self.players):
@@ -27,10 +22,10 @@ class Game():
 
     def player_move(self, player_number):
         
-        if self.state['winner'] == None:
-            
-            move = self.players[player_number - 1].move(self.state)
-            self.state['players'][player_number].append(move)
+        if self.winner == None:
+
+            move = self.players[player_number - 1].move(self.player_coords)
+            self.player_coords[player_number].append(move)
             
             if self.do_draw_game:
                 self.draw_game()
@@ -38,22 +33,16 @@ class Game():
             self.check_if_player_won(player_number)
             
             if self.do_draw_game:
-                print("\ngame.state['winner']:", self.state['winner'])
-
-    def run_to_completion(self):
-        while self.state['winner'] == None:
-            self.player_move(self.who_goes_first)
-            self.player_move(self.who_goes_second)
-            self.state['turn'] += 1
+                print("\nself.winner:", self.winner)
 
     def check_if_player_won(self, player_number):
         
         player_wins = False
-        player_coords = self.state['players'][player_number]
+        player_coords = self.player_coords[player_number]
         
         if len(player_coords) > 2:
-
-            for combination in itertools.combinations(player_coords, 3):
+            
+            for combination in self.combinations(player_coords):
                 
                 xs = [elem[0] for elem in combination]
                 ys = [elem[1] for elem in combination]
@@ -70,21 +59,46 @@ class Game():
                     break
         
             if player_wins:
-                self.state['winner'] = player_number
+                self.winner = player_number
         
-            total_num_coords = self.state['players'][self.who_goes_first] + self.state['players'][self.who_goes_second]
+            total_num_coords = self.player_coords[self.who_goes_first] + self.player_coords[self.who_goes_second]
             if not player_wins and len(total_num_coords) == 9:
-                self.state['winner'] = 'tie'
+                self.winner = 'tie'
     
+    def combinations(self, input_list):
+        
+        combinations_list = []
+                
+        for elem1 in input_list:
+            for elem2 in [elem for elem in input_list if elem != elem1]:
+                for elem3 in [elem for elem in input_list if elem != elem1 and elem != elem2]:
+                    
+                    possible_combination = [elem1, elem2, elem3]
+                    combination_is_original = True
+                            
+                    for combination in combinations_list:
+                        if sorted(combination) == sorted(possible_combination):
+                            combination_is_original = False
+
+                    if combination_is_original:
+                        combinations_list.append(possible_combination)
+                
+        return combinations_list
+
+    def run_to_completion(self):
+        while self.winner == None:
+            self.player_move(self.who_goes_first)
+            self.player_move(self.who_goes_second)
+
     def draw_game(self):
         
         rows = [['-' for _ in range(3)] for _ in range(3)]
         
-        for x, y in self.state['players'][1]:
-            rows[x][y] = 'X'
+        for x, y in self.player_coords[1]:
+            rows[y][x] = 'X'
         
-        for x, y in self.state['players'][2]:
-            rows[x][y] = 'O'
+        for x, y in self.player_coords[2]:
+            rows[y][x] = 'O'
 
         str_row_list = ['', '', '']
         for i in range(3):
