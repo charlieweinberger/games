@@ -86,7 +86,10 @@ class TicTacToe():
             for elem in rows[i]:
                 str_row_list[i] += str(elem) + ' '
         
-        print('\n' + str_row_list[0] + '\n' + str_row_list[1] + '\n' + str_row_list[2])
+        print('')
+        print(str_row_list[0])
+        print(str_row_list[1])
+        print(str_row_list[2])
 
     def combinations(self, player_coords):
         
