@@ -8,5 +8,5 @@ class RandomPlayer():
     def set_player_number(self, n):
         self.player_number = n
 
-    def move(self, free_coords):
-        return random.choice(free_coords)
+    def move(self, available_moves):
+        return random.choice(available_moves)
