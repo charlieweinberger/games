@@ -49,7 +49,7 @@ class TicTacToe():
         player_coords = self.player_coords[player_number]
 
         if len(player_coords) > 2:
-                
+
             for combination in self.combinations(player_coords):
                     
                 xs = [elem[0] for elem in combination]
