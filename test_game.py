@@ -1,9 +1,12 @@
 import sys
 from game import *
-from random_player import *
+from player import *
 import time
 
-players = [RandomPlayer(), RandomPlayer()]
+players = [Player(), Player()]
+
+players[0].set_strategy()
+print(players[0].strategy)
 
 num_wins = {0: 0, 1: 0, 2: 0}
 num_trials = 1000
