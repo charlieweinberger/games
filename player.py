@@ -9,8 +9,10 @@ class Player():
     def set_player_number(self, n):
         self.player_number = n
 
-    def move(self, available_moves):
-        return random.choice(available_moves)
+    def move(self, game_state):
+        # available_moves = [elem for elem in range(9) if game_state[elem] == 0]
+        # return random.choice(available_moves)
+        return self.strategy[game_state]
 
     def set_strategy(self):
 

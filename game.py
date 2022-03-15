@@ -10,7 +10,7 @@ class TicTacToe():
 
         self.do_draw_game = do_draw_game
         
-        self.game_state = [0 for _ in range(9)]
+        self.game_state = '000000000'
         
         self.winner = None
 
@@ -33,8 +33,7 @@ class TicTacToe():
                         self.draw_game()
 
     def move(self, player_number):
-        available_moves = [elem for elem in range(9) if self.game_state[elem] == 0]
-        move = self.players[player_number - 1].move(available_moves)
+        move = self.players[player_number - 1].move(self.game_state)
         self.game_state[move] = player_number
 
     def check_for_winner(self):
@@ -54,8 +53,8 @@ class TicTacToe():
             if arr[0] == arr[1] and arr[1] == arr[2] and arr[0] == arr[2] and arr[0] != 0:
                 return arr[0]
 
-        if 0 not in self.game_state:
-            return 0
+        if '0' not in self.game_state:
+            return '0'
 
     def draw_game(self):
         
@@ -63,7 +62,7 @@ class TicTacToe():
 
         for key in self.player_order:
             for index, x in enumerate(self.game_state):
-                if x == key:
+                if int(x) == key:
                     rows[index] = key
         
         print(f'\n{rows[0]} {rows[1]} {rows[2]}')
