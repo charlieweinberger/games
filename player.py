@@ -33,7 +33,18 @@ class Player():
                                                     if test(b, e, h):
                                                         for i in n:
                                                             if test(g, h, i) and test(c, f, i) and test(a, e, i):
+                                                                # print('')
                                                                 key = f'{a}{b}{c}{d}{e}{f}{g}{h}{i}'
-                                                                strategy[key] = random.randint(0, 8)
+                                                                # print(f'\n{key = }')
+                                                                kv = {0: a, 1: b, 2: c, 3: d, 4: e, 5: f, 6: g, 7: h, 8: i}
+                                                                # print(f'\n{kv = }')
+                                                                new_dict = {k:v for k,v in kv.items() if v == '0'}
+                                                                # print(f'\n{new_dict = }')
+                                                                # print(f'{new_dict != {}}')
+                                                                if new_dict != {}:
+                                                                    choice = random.choice(list(new_dict.keys()))
+                                                                    strategy[key] = choice
+                                                                    # print(f'\n{list(new_dict.keys()) = }')
+                                                                    # print(f'\n{choice = }')
         
         return strategy

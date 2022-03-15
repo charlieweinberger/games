@@ -5,7 +5,7 @@ class TicTacToe():
     def __init__(self, players, who_goes_first=1, do_draw_game=False):
         
         self.players = players
-        self.player_order = [1 if who_goes_first == 2 else 2]
+        self.player_order = [1 if who_goes_first == 1 else 2]
         self.set_player_numbers()
 
         self.do_draw_game = do_draw_game
@@ -35,17 +35,20 @@ class TicTacToe():
     def move(self, player_number):
         move = self.players[player_number - 1].move(self.game_state)
 
-        print(f'\n{move = }')
-        print(f'before {self.game_state = }')
+        # print(f'\n{move = }')
+        # print(f'before {self.game_state = }')
 
         game_state_copy = list(self.game_state)
+        # print(f'before {game_state_copy = }')
         game_state_copy[move] = str(player_number)
+
+        # print(f'after {game_state_copy = }')
 
         self.game_state = ''
         for elem in game_state_copy:
             self.game_state += elem
         
-        print(f'after  {self.game_state = }')
+        # print(f'after  {self.game_state = }')
         
     def check_for_winner(self):
 

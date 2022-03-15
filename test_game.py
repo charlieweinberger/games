@@ -14,12 +14,12 @@ def have_strategies_fight(info, i):
 
             for game_number in [player.player_number for player in this_round_players]:
 
-                print('new game')
+                # print('new game')
 
                 game = TicTacToe(this_round_players, who_goes_first=game_number)
                 game.run_to_completion()
                 
-                if game.winner != '0': print(f'{game.winner = }')
+                # print(f'{game.winner = }')
                 
                 if game.winner == '1':
                     info[i][player_1] += 1
