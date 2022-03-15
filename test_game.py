@@ -1,27 +1,64 @@
-import sys
 from game import *
 from player import *
 
-players = []
-strategies = []
+def set_strategies(players):
+    for _ in range(25):
+        player = Player()
+        player.set_strategy()
+        players[player] = 0
 
-for _ in range(25):
-    player = Player()
-    player.set_strategy()
-    players.append(player)
-    strategies.append(player.strategy)
+def have_strategies_fight(players):
 
-# num_wins = {0: 0, 1: 0, 2: 0}
-# num_trials = 1000
+    for player_1 in players:
+        for player_2 in players:
 
-# for i in range(num_trials):
+            if player_1 == player_2: continue
+
+            this_round_players = [player_1, player_2]
+
+            for game_number in [player.player_number for player in this_round_players]:
+
+                game = TicTacToe(this_round_players, who_goes_first=game_number)
+                game.run_to_completion()
+
+                if game.winner == '1':
+                    players[player_1] += 1
+                    players[player_2] -= 1
+                
+                if game.winner == '2':
+                    players[player_1] -= 1
+                    players[player_2] += 1
+
+def mate(players):
+
+    new_players = {}
+
+    best_5_players = dict(sorted(players.items(), key=lambda elem: elem[1])).keys()[-5:]
+
+    for player_1 in players:
+        for player_2 in players:
+
+            if player_1 == player_2: continue
+
+            this_round_players = [player_1, player_2]
+
+            for offspring_number in [player.player_number for player in this_round_players]:
+
+                offspring = Player()
+                offspring.set_strategy()
+
+                for index in offspring.strategy:
+                    coin_flip = random.randint(0, 1)
+                    offspring.strategy[index] = this_round_players[coin_flip].strategy[index]
+                
+                new_players[offspring] = 0
     
-#     game = TicTacToe(players, who_goes_first = (i % 2) + 1, do_draw_game = (i == 0))
-#     game.run_to_completion()
-#     num_wins[game.winner] += (100 / num_trials)
+    return list(new_players)
 
-#     if i == 0:
-#         print(f"\n{game.winner = }")
+players = {}
 
-# num_wins = {key:round(value, 5) for key, value in num_wins.items()}
-# print(f"\n{num_wins = }\n")
+set_strategies(players)
+
+for i in range(15):
+    have_strategies_fight(players)
+    players = mate(players)

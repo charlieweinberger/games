@@ -2,7 +2,7 @@ import math
 
 class TicTacToe():
 
-    def __init__(self, players, who_goes_first, do_draw_game=False):
+    def __init__(self, players, who_goes_first=1, do_draw_game=False):
         
         self.players = players
         self.player_order = [who_goes_first, 1 if who_goes_first == 2 else 2]
