@@ -1,8 +1,6 @@
 from game import *
 from player import *
 
-number_of_generations = 15
-
 def have_strategies_fight(info, i):
 
     for player_1 in info[i]:
@@ -12,19 +10,19 @@ def have_strategies_fight(info, i):
 
             this_round_players = [player_1, player_2]
 
+            print(f'\n{[player.player_number for player in this_round_players] = }')
+
             for game_number in [player.player_number for player in this_round_players]:
 
-                # print('new game')
+                # print(f'\n{game_number = }')
 
                 game = TicTacToe(this_round_players, who_goes_first=game_number)
                 game.run_to_completion()
-                
-                # print(f'{game.winner = }')
-                
+
                 if game.winner == '1':
                     info[i][player_1] += 1
                     info[i][player_2] -= 1
-                
+
                 if game.winner == '2':
                     info[i][player_1] -= 1
                     info[i][player_2] += 1
@@ -55,10 +53,14 @@ def mate(info, i):
 
 info = {0: {Player() : 0 for _ in range(25)}}
 
+number_of_generations = 1
+
 for i in range(number_of_generations):
     print(f'{i = }')
     have_strategies_fight(info, i)
-    info[i + 1] = mate(info, i)
+    # info[i + 1] = mate(info, i)
+
+# print(f'\n{winners = }')
 
 print(f'\n{info[0] = }')
-print(f'\n{info[14] = }')
+# print(f'\n{info[number_of_generations-1] = }')
