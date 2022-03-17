@@ -6,6 +6,7 @@ class TicTacToe():
         
         self.players = players
         self.set_player_numbers()
+
         self.player_order = [who_goes_first, 3-who_goes_first]
 
         self.do_draw_game = do_draw_game

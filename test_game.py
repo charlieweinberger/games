@@ -10,57 +10,49 @@ def have_strategies_fight(info, i):
 
             this_round_players = [player_1, player_2]
 
-            print(f'\n{[player.player_number for player in this_round_players] = }')
+            for n in [1, 2]:
 
-            for game_number in [player.player_number for player in this_round_players]:
-
-                # print(f'\n{game_number = }')
-
-                game = TicTacToe(this_round_players, who_goes_first=game_number)
+                game = TicTacToe(this_round_players, who_goes_first=n)
                 game.run_to_completion()
 
                 if game.winner == '1':
                     info[i][player_1] += 1
                     info[i][player_2] -= 1
 
-                if game.winner == '2':
+                elif game.winner == '2':
                     info[i][player_1] -= 1
                     info[i][player_2] += 1
 
 def mate(info, i):
 
-    next_gen = {}
-
     best_5_players = list(dict(sorted(info[i].items(), key=lambda elem: elem[1])).keys())[-5:]
+
+    next_gen = {player:0 for player in best_5_players}
 
     for player_1 in best_5_players:
         for player_2 in best_5_players:
 
             if player_1 == player_2: continue
 
-            this_round_players = [player_1, player_2]
+            offspring = Player()
 
-            for _ in range(2):
-
-                offspring = Player()
-
-                for index in offspring.strategy:
-                    offspring.strategy[index] = random.choice(this_round_players).strategy[index]
+            for index in offspring.strategy:
+                offspring.strategy[index] = random.choice([player_1, player_2]).strategy[index]
                 
-                next_gen[offspring] = 0
+            next_gen[offspring] = 0
     
     return next_gen
 
 info = {0: {Player() : 0 for _ in range(25)}}
 
-number_of_generations = 1
+number_of_generations = 15
 
 for i in range(number_of_generations):
-    print(f'{i = }')
+    print(f'\n{i = }')
     have_strategies_fight(info, i)
-    # info[i + 1] = mate(info, i)
+    info[i + 1] = mate(info, i)
 
-# print(f'\n{winners = }')
+    print(list(info[i].values()))
+    print(sorted(list(info[i].values())))
 
-print(f'\n{info[0] = }')
-# print(f'\n{info[number_of_generations-1] = }')
+import matplotlib as plt
