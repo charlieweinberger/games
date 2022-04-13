@@ -35,22 +35,14 @@ class TicTacToe():
                     
     def move(self, player_number):
         move = self.players[player_number - 1].move(self.game_state)
-
-        # print(f'\n{move = }')
-        # print(f'before {self.game_state = }')
-
+        
         game_state_copy = list(self.game_state)
-        # print(f'before {game_state_copy = }')
         game_state_copy[move] = str(player_number)
-
-        # print(f'after {game_state_copy = }')
 
         self.game_state = ''
         for elem in game_state_copy:
             self.game_state += elem
-        
-        # print(f'after  {self.game_state = }')
-        
+                
     def check_for_winner(self):
 
         winning_options = [
@@ -66,10 +58,10 @@ class TicTacToe():
 
         for arr in winning_options:
             if arr[0] == arr[1] and arr[1] == arr[2] and arr[0] == arr[2] and arr[0] != '0':
-                return arr[0]
+                return int(arr[0])
 
         if '0' not in self.game_state:
-            return '0'
+            return 0
 
     def draw_game(self):
         

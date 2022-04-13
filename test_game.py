@@ -1,38 +1,37 @@
 from game import *
 from player import *
 
-def have_strategies_fight(info, i):
+info = {0: {Player() : 0 for _ in range(25)}}
+plot_1 = []
+
+def have_strategies_fight(i):
 
     for player_1 in info[i]:
-        for player_2 in info[i]:
-
-            if player_1 == player_2: continue
-
-            this_round_players = [player_1, player_2]
+        for player_2 in [elem for elem in info[i] if elem != player_1]:
 
             for n in [1, 2]:
 
-                game = TicTacToe(this_round_players, who_goes_first=n)
+                game = TicTacToe([player_1, player_2], who_goes_first=n)
                 game.run_to_completion()
 
-                if game.winner == '1':
+                if game.winner == 1:
                     info[i][player_1] += 1
                     info[i][player_2] -= 1
 
-                elif game.winner == '2':
+                elif game.winner == 2:
                     info[i][player_1] -= 1
                     info[i][player_2] += 1
 
-def mate(info, i):
+def mate(i):
 
     best_5_players = list(dict(sorted(info[i].items(), key=lambda elem: elem[1])).keys())[-5:]
+
+    plot_1.append(fight_first_gen(best_5_players))
 
     next_gen = {player:0 for player in best_5_players}
 
     for player_1 in best_5_players:
-        for player_2 in best_5_players:
-
-            if player_1 == player_2: continue
+        for player_2 in [elem for elem in best_5_players if elem != player_1]:
 
             offspring = Player()
 
@@ -43,15 +42,13 @@ def mate(info, i):
     
     return next_gen
 
-def gen_i_vs_j(info, i, j):
+def fight_first_gen(best_5_players):
+    
+    score = 0
 
-    scores = []
+    for player_1 in best_5_players:
 
-    for player_1 in info[i]:
-
-        score = 0
-
-        for player_2 in info[j]:
+        for player_2 in info[0]:
 
             if player_1 == player_2: continue
 
@@ -62,50 +59,73 @@ def gen_i_vs_j(info, i, j):
                 game = TicTacToe(this_round_players, who_goes_first=n)
                 game.run_to_completion()
 
-                if   game.winner == '1': score -= 1
-                elif game.winner == '2': score += 1
+                if   game.winner ==   n: score += 1
+                elif game.winner == 3-n: score -= 1
+    
+    return score / 5
 
-        scores.append(score)
+# def gen_i_vs_j(i, j):
 
-    return scores
+    # scores = []
 
-# code
+    # for player_1 in info[i]:
 
-info = {0: {Player() : 0 for _ in range(25)}}
+    #     score = 0
+
+    #     for player_2 in info[j]:
+
+    #         if player_1 == player_2: continue
+
+    #         this_round_players = [player_1, player_2]
+
+    #         for n in [1, 2]:
+
+    #             game = TicTacToe(this_round_players, who_goes_first=n)
+    #             game.run_to_completion()
+
+    #             if   game.winner == 1: score -= 1
+    #             elif game.winner == 2: score += 1
+
+    #     scores.append(score)
+
+    # return scores
 
 number_of_generations = 25
 
-plots = {
+# y_vals = []
+
+# plots = {
     # 'gen 0 vs gen i': []
-    'gen i-1 vs gen i': []
-}
+    # 'gen i-1 vs gen i': []
+# }
 
 for i in range(number_of_generations):
     
-    have_strategies_fight(info, i)
+    have_strategies_fight(i)
+    info[i + 1] = mate(i)
 
-    # plot_1 = gen_i_vs_j(info, 0, i)
+    # y_val_list = fight_first_gen(i)
+    # y_vals.append(sum(y_val_list) / len(y_val_list))
+
+    # plot_1 = gen_i_vs_j(0, i)
     # plots['gen 0 vs gen i'].append(sum(plot_1) / len(plot_1))
 
-    if i != 0:
-        plot_2 = gen_i_vs_j(info, i-1, i)
-        plots['gen i-1 vs gen i'].append(sum(plot_2) / len(plot_2))
-    
-    info[i + 1] = mate(info, i)
-
-# plotting
+    # if i != 0:
+        # plot_2 = gen_i_vs_j(i-1, i)
+        # plots['gen i-1 vs gen i'].append(sum(plot_2) / len(plot_2))
 
 import matplotlib.pyplot as plt
 plt.style.use('bmh')
 
 # plt.figure(1)
+plt.plot(list(range(number_of_generations)), plot_1)
 # plt.plot(list(range(number_of_generations)), plots['gen 0 vs gen i'])
-# plt.xlabel('generation number')
-# plt.ylabel('score vs 1st generation')
-# plt.savefig('plot_1.png')
-
-# plt.figure(2)
-plt.plot(list(range(1, number_of_generations)), plots['gen i-1 vs gen i'])
 plt.xlabel('generation number')
-plt.ylabel('score vs previous generation')
-plt.savefig('plot_3.png')
+plt.ylabel('score vs 1st generation')
+plt.savefig('plot_1.png')
+
+# # plt.figure(2)
+# plt.plot(list(range(1, number_of_generations)), plots['gen i-1 vs gen i'])
+# plt.xlabel('generation number')
+# plt.ylabel('score vs previous generation')
+# plt.savefig('plot_3.png')
