@@ -1,13 +1,33 @@
+import matplotlib.pyplot as plt
+plt.style.use('bmh')
 from game import *
 from player import *
 
-info = {0: {Player() : 0 for _ in range(25)}}
+# made line 10 like line 9, aka get the top 5 players by score. the 2nd bracket (the empty one) in line 10 should be the player id, which you get using the scores dict.
+
+# info = {0: {Player() : 0 for _ in range(25)}}
+# dict(sorted(info[i].items(), key=lambda elem: elem[1])).keys()
+# players[i][][-5:]
+
+players = {0: [Player() for _ in range(25)]}
+scores  = {0: {i:0 for i in range(25)}}
+
 plot_1 = []
+plot_2 = []
+
+def set_player_id(i):
+    for j in range(25):
+        players[i][iden].id = j
 
 def have_strategies_fight(i):
 
-    for player_1 in info[i]:
-        for player_2 in [elem for elem in info[i] if elem != player_1]:
+    set_player_id(i)
+    if i == 0: print([player.id for player in players[0]])
+
+    for player_1 in players[i]:
+        for player_2 in players[i]:
+
+            if player_1.id == player_2.id: continue
 
             for n in [1, 2]:
 
@@ -15,18 +35,20 @@ def have_strategies_fight(i):
                 game.run_to_completion()
 
                 if game.winner == 1:
-                    info[i][player_1] += 1
-                    info[i][player_2] -= 1
+                    info[i][player_1.id] += 1
+                    info[i][player_2.id] -= 1
 
                 elif game.winner == 2:
-                    info[i][player_1] -= 1
-                    info[i][player_2] += 1
+                    info[i][player_1.id] -= 1
+                    info[i][player_2.id] += 1
 
 def mate(i):
 
     best_5_players = list(dict(sorted(info[i].items(), key=lambda elem: elem[1])).keys())[-5:]
 
-    plot_1.append(fight_first_gen(best_5_players))
+    plot_1.append(fight_another_gen(best_5_players, 0))
+    if i != 0:
+        plot_2.append(fight_another_gen(best_5_players, i-1))
 
     next_gen = {player:0 for player in best_5_players}
 
@@ -42,13 +64,13 @@ def mate(i):
     
     return next_gen
 
-def fight_first_gen(best_5_players):
+def fight_another_gen(best_5_players, i):
     
     score = 0
 
     for player_1 in best_5_players:
 
-        for player_2 in info[0]:
+        for player_2 in info[i]:
 
             if player_1 == player_2: continue
 
@@ -64,68 +86,20 @@ def fight_first_gen(best_5_players):
     
     return score / 5
 
-# def gen_i_vs_j(i, j):
-
-    # scores = []
-
-    # for player_1 in info[i]:
-
-    #     score = 0
-
-    #     for player_2 in info[j]:
-
-    #         if player_1 == player_2: continue
-
-    #         this_round_players = [player_1, player_2]
-
-    #         for n in [1, 2]:
-
-    #             game = TicTacToe(this_round_players, who_goes_first=n)
-    #             game.run_to_completion()
-
-    #             if   game.winner == 1: score -= 1
-    #             elif game.winner == 2: score += 1
-
-    #     scores.append(score)
-
-    # return scores
-
 number_of_generations = 25
 
-# y_vals = []
-
-# plots = {
-    # 'gen 0 vs gen i': []
-    # 'gen i-1 vs gen i': []
-# }
-
 for i in range(number_of_generations):
-    
     have_strategies_fight(i)
     info[i + 1] = mate(i)
 
-    # y_val_list = fight_first_gen(i)
-    # y_vals.append(sum(y_val_list) / len(y_val_list))
-
-    # plot_1 = gen_i_vs_j(0, i)
-    # plots['gen 0 vs gen i'].append(sum(plot_1) / len(plot_1))
-
-    # if i != 0:
-        # plot_2 = gen_i_vs_j(i-1, i)
-        # plots['gen i-1 vs gen i'].append(sum(plot_2) / len(plot_2))
-
-import matplotlib.pyplot as plt
-plt.style.use('bmh')
-
 # plt.figure(1)
-plt.plot(list(range(number_of_generations)), plot_1)
-# plt.plot(list(range(number_of_generations)), plots['gen 0 vs gen i'])
-plt.xlabel('generation number')
-plt.ylabel('score vs 1st generation')
-plt.savefig('plot_1.png')
-
-# # plt.figure(2)
-# plt.plot(list(range(1, number_of_generations)), plots['gen i-1 vs gen i'])
+# plt.plot(list(range(number_of_generations)), plot_1)
 # plt.xlabel('generation number')
-# plt.ylabel('score vs previous generation')
-# plt.savefig('plot_3.png')
+# plt.ylabel('score vs 1st generation')
+# plt.savefig('plot_1.png')
+
+# plt.figure(2)
+plt.plot(list(range(1, number_of_generations)), plot_2)
+plt.xlabel('generation number')
+plt.ylabel('score vs previous generation')
+plt.savefig('plot_2.png')

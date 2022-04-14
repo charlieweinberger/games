@@ -4,6 +4,7 @@ class Player():
     
     def __init__(self):
         self.player_number = None
+        self.id = None
         self.strategy = self.set_strategy()
 
     def set_player_number(self, n):
