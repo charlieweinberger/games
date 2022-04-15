@@ -3,26 +3,17 @@ plt.style.use('bmh')
 from game import *
 from player import *
 
-# made line 10 like line 9, aka get the top 5 players by score. the 2nd bracket (the empty one) in line 10 should be the player id, which you get using the scores dict.
-
-# info = {0: {Player() : 0 for _ in range(25)}}
-# dict(sorted(info[i].items(), key=lambda elem: elem[1])).keys()
-# players[i][][-5:]
-
 players = {0: [Player() for _ in range(25)]}
 scores  = {0: {i:0 for i in range(25)}}
 
 plot_1 = []
 plot_2 = []
 
-def set_player_id(i):
-    for j in range(25):
-        players[i][iden].id = j
-
 def have_strategies_fight(i):
 
-    set_player_id(i)
-    if i == 0: print([player.id for player in players[0]])
+    if i == 0:
+        for j in range(25):
+            players[i][j].id = j
 
     for player_1 in players[i]:
         for player_2 in players[i]:
@@ -35,50 +26,55 @@ def have_strategies_fight(i):
                 game.run_to_completion()
 
                 if game.winner == 1:
-                    info[i][player_1.id] += 1
-                    info[i][player_2.id] -= 1
+                    scores[i][player_1.id] += 1
+                    scores[i][player_2.id] -= 1
 
                 elif game.winner == 2:
-                    info[i][player_1.id] -= 1
-                    info[i][player_2.id] += 1
+                    scores[i][player_1.id] -= 1
+                    scores[i][player_2.id] += 1
 
 def mate(i):
-
-    best_5_players = list(dict(sorted(info[i].items(), key=lambda elem: elem[1])).keys())[-5:]
+    
+    best_5_player_ids = list(dict(sorted(scores[i].items(), key=lambda elem: elem[1])).keys())[-5:]
+    best_5_players = [players[i][player_id] for player_id in best_5_player_ids]
 
     plot_1.append(fight_another_gen(best_5_players, 0))
-    if i != 0:
-        plot_2.append(fight_another_gen(best_5_players, i-1))
+    if i != 0: plot_2.append(fight_another_gen(best_5_players, i-1))
 
-    next_gen = {player:0 for player in best_5_players}
+    next_gen_players = best_5_players.copy()
+    next_gen_scores  = {player.id:0 for player in best_5_players}
+
+    player_id = 5
 
     for player_1 in best_5_players:
-        for player_2 in [elem for elem in best_5_players if elem != player_1]:
+        for player_2 in best_5_players:
+
+            if player_1 == player_2: continue
 
             offspring = Player()
+            offspring.id = player_id
+            player_id += 1
 
             for index in offspring.strategy:
                 offspring.strategy[index] = random.choice([player_1, player_2]).strategy[index]
-                
-            next_gen[offspring] = 0
+            
+            next_gen_players.append(offspring)
+            next_gen_scores[offspring.id] = 0
     
-    return next_gen
+    return next_gen_players, next_gen_scores
 
 def fight_another_gen(best_5_players, i):
     
     score = 0
 
     for player_1 in best_5_players:
-
-        for player_2 in info[i]:
+        for player_2 in players[i]:
 
             if player_1 == player_2: continue
 
-            this_round_players = [player_1, player_2]
-
             for n in [1, 2]:
 
-                game = TicTacToe(this_round_players, who_goes_first=n)
+                game = TicTacToe([player_1, player_2], who_goes_first=n)
                 game.run_to_completion()
 
                 if   game.winner ==   n: score += 1
@@ -86,19 +82,34 @@ def fight_another_gen(best_5_players, i):
     
     return score / 5
 
+# players = {0: [Player() for _ in range(25)]}
+# scores  = {0: {i:0 for i in range(25)}}
+
+def strats_have_converged(i):
+    for j in range(25):
+        for k in range(25):
+            if players[i][j].strategy != players[i][k].strategy:
+                pass
+
 number_of_generations = 25
 
 for i in range(number_of_generations):
+    
+    print(i)
+    
     have_strategies_fight(i)
-    info[i + 1] = mate(i)
+    players[i + 1], scores[i + 1] = mate(i)
 
-# plt.figure(1)
-# plt.plot(list(range(number_of_generations)), plot_1)
-# plt.xlabel('generation number')
-# plt.ylabel('score vs 1st generation')
-# plt.savefig('plot_1.png')
+    if strats_have_converged(i):
+        pass
 
-# plt.figure(2)
+plt.figure(1)
+plt.plot(list(range(number_of_generations)), plot_1)
+plt.xlabel('generation number')
+plt.ylabel('score vs 1st generation')
+plt.savefig('plot_1.png')
+
+plt.figure(2)
 plt.plot(list(range(1, number_of_generations)), plot_2)
 plt.xlabel('generation number')
 plt.ylabel('score vs previous generation')
