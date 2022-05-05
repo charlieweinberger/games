@@ -6,8 +6,10 @@ from player import *
 players = {0: [Player() for _ in range(25)]}
 scores  = {0: {i:0 for i in range(25)}}
 
-plot_1 = []
-plot_2 = []
+# plot_1 = []
+# plot_2 = []
+plot_3 = []
+plot_4 = []
 
 def have_strategies_fight(i):
 
@@ -33,13 +35,28 @@ def have_strategies_fight(i):
                     scores[i][player_1.id] -= 1
                     scores[i][player_2.id] += 1
 
-def mate(i):
+def select_best(i, selection_method):
+    if selection_method == 'hard_cutoff':
+        return list(dict(sorted(scores[i].items(), key=lambda elem: elem[1])).keys())[-5:]
+    if selection_method == 'tournament':
+        best_player_ids = []
+        for j in range(5):
+            random_3_ids = [random.randint(0, 25) for k in range(3) if k not in best_player_ids]
+            # scores_for_random = {k:v for k, v in scores[i].items() if k in random_3_ids}
+            scores_for_random = {k:scores[i][k] for k in random_3_ids}
+            best_id_of_3 = list(dict(sorted(scores_for_random.items(), key=lambda elem: elem[1])).keys())[-1]
+            best_player_ids.append(best_id_of_3)
+        return best_player_ids
+
+def mate(i, selection_method):
     
-    best_5_player_ids = list(dict(sorted(scores[i].items(), key=lambda elem: elem[1])).keys())[-5:]
+    best_5_player_ids = select_best(i, selection_method)
     best_5_players = [players[i][player_id] for player_id in best_5_player_ids]
 
-    plot_1.append(fight_another_gen(best_5_players, 0))
-    if i != 0: plot_2.append(fight_another_gen(best_5_players, i-1))
+    # plot_1.append(fight_another_gen(best_5_players, 0))
+    plot_3.append(fight_another_gen(best_5_players, 0))
+    # if i != 0: plot_2.append(fight_another_gen(best_5_players, i-1))
+    if i != 0: plot_4.append(fight_another_gen(best_5_players, i-1))
 
     next_gen_players = best_5_players.copy()
     next_gen_scores  = {player.id:0 for player in best_5_players}
@@ -70,7 +87,7 @@ def fight_another_gen(best_5_players, i):
     for player_1 in best_5_players:
         for player_2 in players[i]:
 
-            if player_1 == player_2: continue
+            if player_1.id == player_2.id: continue
 
             for n in [1, 2]:
 
@@ -82,35 +99,43 @@ def fight_another_gen(best_5_players, i):
     
     return score / 5
 
-# players = {0: [Player() for _ in range(25)]}
-# scores  = {0: {i:0 for i in range(25)}}
-
 def strats_have_converged(i):
+
+    have_converged = True
+
     for j in range(25):
         for k in range(25):
             if players[i][j].strategy != players[i][k].strategy:
-                pass
+                have_converged = False
 
-number_of_generations = 25
+    return have_converged
+
+number_of_generations = 20
 
 for i in range(number_of_generations):
-    
-    print(i)
-    
     have_strategies_fight(i)
-    players[i + 1], scores[i + 1] = mate(i)
+    players[i + 1], scores[i + 1] = mate(i, 'tournament')
 
-    if strats_have_converged(i):
-        pass
-
-plt.figure(1)
-plt.plot(list(range(number_of_generations)), plot_1)
+plt.figure(3)
+plt.plot(list(range(number_of_generations)), plot_3)
 plt.xlabel('generation number')
-plt.ylabel('score vs 1st generation')
-plt.savefig('plot_1.png')
+plt.ylabel('tournament selection: score vs 1st generation')
+plt.savefig('plot_3.png')
 
-plt.figure(2)
-plt.plot(list(range(1, number_of_generations)), plot_2)
+plt.figure(4)
+plt.plot(list(range(1, number_of_generations)), plot_4)
 plt.xlabel('generation number')
-plt.ylabel('score vs previous generation')
-plt.savefig('plot_2.png')
+plt.ylabel('tournament selection: score vs previous generation')
+plt.savefig('plot_4.png')
+
+# plt.figure(1)
+# plt.plot(list(range(number_of_generations)), plot_1)
+# plt.xlabel('generation number')
+# plt.ylabel('hard cutoff: score vs 1st generation')
+# plt.savefig('plot_1.png')
+
+# plt.figure(2)
+# plt.plot(list(range(1, number_of_generations)), plot_2)
+# plt.xlabel('generation number')
+# plt.ylabel('hard cutoff: score vs previous generation')
+# plt.savefig('plot_2.png')
